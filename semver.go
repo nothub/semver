@@ -91,6 +91,10 @@ func Compare(a Version, b Version) int {
 		}
 	}
 
+	return comparePreRelease(a, b)
+}
+
+func comparePreRelease(a Version, b Version) int {
 	// release versions have precedence
 	if a.IsRelease() && !b.IsRelease() {
 		return +1
@@ -135,8 +139,6 @@ func Compare(a Version, b Version) int {
 			}
 		}
 	}
-
-	// versions are equal
 	return 0
 }
 
