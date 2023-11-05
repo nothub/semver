@@ -47,6 +47,10 @@ func Parse(str string) (Version, error) {
 	return ver, nil
 }
 
+func (v Version) IsRelease() bool {
+	return len(v.PreRelease) == 0
+}
+
 // Newer returns true if a is newer than b.
 // Build metadata is ignored in this comparison.
 func (a Version) Newer(b Version) bool {
