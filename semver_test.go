@@ -399,6 +399,41 @@ func TestCompare(t *testing.T) {
 			b:        "1.0.0-a.b+foo.bar",
 			expected: -1,
 		},
+		{
+			a:        "1.0.0-alpha",
+			b:        "1.0.0-alpha.1",
+			expected: -1,
+		},
+		{
+			a:        "1.0.0-alpha.1",
+			b:        "1.0.0-alpha.beta",
+			expected: -1,
+		},
+		{
+			a:        "1.0.0-alpha.beta",
+			b:        "1.0.0-beta",
+			expected: -1,
+		},
+		{
+			a:        "1.0.0-beta",
+			b:        "1.0.0-beta.2",
+			expected: -1,
+		},
+		{
+			a:        "1.0.0-beta.2",
+			b:        "1.0.0-beta.11",
+			expected: -1,
+		},
+		{
+			a:        "1.0.0-beta.11",
+			b:        "1.0.0-rc.1",
+			expected: -1,
+		},
+		{
+			a:        "1.0.0-rc.1",
+			b:        "1.0.0",
+			expected: -1,
+		},
 	}
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("%s %s", test.a, test.b), func(t *testing.T) {
