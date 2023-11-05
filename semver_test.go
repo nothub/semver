@@ -1,6 +1,7 @@
 package semver
 
 import (
+	"errors"
 	"reflect"
 	"testing"
 )
@@ -249,6 +250,10 @@ func TestParseInvalids(t *testing.T) {
 			_, err := Parse(test)
 			if err == nil {
 				t.Error("should error")
+				return
+			}
+			if !errors.Is(err, ErrInvalid) {
+				t.Errorf("unexpected error = %s", err)
 				return
 			}
 		})
