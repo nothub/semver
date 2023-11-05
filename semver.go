@@ -50,13 +50,13 @@ func Parse(str string) (Version, error) {
 // Newer returns true if a is newer than b.
 // Build metadata is ignored in this comparison.
 func (a Version) Newer(b Version) bool {
-	return Compare(a, b) > 0
+	return Compare(a, b) == +1
 }
 
 // Older returns true if a is older than b.
 // Build metadata is ignored in this comparison.
 func (a Version) Older(b Version) bool {
-	return Compare(a, b) < 0
+	return Compare(a, b) == -1
 }
 
 // Same returns true if a and b are equal.
