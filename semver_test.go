@@ -193,6 +193,9 @@ func TestParseValids(t *testing.T) {
 			if !reflect.DeepEqual(test.expected, result) {
 				t.Errorf("unexpected result:\nexpected = %+v\nactual   = %+v", test.expected, result)
 			}
+			if test.input != result.String() {
+				t.Errorf("non equal string format:\nexpected = %s\nactual   = %s", test.input, result.String())
+			}
 		})
 	}
 }
