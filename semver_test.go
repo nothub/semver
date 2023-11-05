@@ -1,6 +1,7 @@
 package semver
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -189,7 +190,7 @@ func TestParseValids(t *testing.T) {
 				t.Errorf("error = %v", err)
 				return
 			}
-			if !test.expected.Same(result) {
+			if !reflect.DeepEqual(test.expected, result) {
 				t.Errorf("unexpected result:\nexpected = %+v\nactual   = %+v", test.expected, result)
 			}
 		})
