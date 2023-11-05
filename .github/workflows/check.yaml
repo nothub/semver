@@ -11,4 +11,4 @@ jobs:
           check-latest: true
           cache: true
       - run: |
-          go test .
+          go test -v
