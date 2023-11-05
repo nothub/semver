@@ -74,6 +74,8 @@ func (a Version) Same(b Version) bool {
 //	a older than b: -1
 //	a newer than b: +1
 //	a is same as b:  0
+//
+// Build metadata is ignored in this comparison.
 func Compare(a Version, b Version) int {
 	// compare version core
 	for _, result := range []int{
@@ -108,14 +110,17 @@ func Compare(a Version, b Version) int {
 		}
 
 		if isDigits(a.PreRelease[i]) && isDigits(b.PreRelease[i]) {
-			// identifiers consisting of only digits are compared numerically
+			// identifiers consisting only of digits are compared numerically
+
+			// if a digit string is longer, it has precedence
 			if len(a.PreRelease[i]) > len(b.PreRelease[i]) {
 				return +1
 			}
 			if len(a.PreRelease[i]) < len(b.PreRelease[i]) {
 				return -1
 			}
-			// same length, compare strings digit by digit
+
+			// for same length digit strings, compare strings digit by digit
 			for j := range a.PreRelease[i] {
 				result := strings.Compare(a.PreRelease[i][j:j+1], b.PreRelease[i][j:j+1])
 				if result != 0 {
