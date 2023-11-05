@@ -75,7 +75,6 @@ func (a Version) Same(b Version) bool {
 //	a newer than b: +1
 //	a is same as b:  0
 func Compare(a Version, b Version) int {
-	// compare version core
 	for _, result := range []int{
 		strings.Compare(a.Major, b.Major),
 		strings.Compare(a.Minor, b.Minor),
@@ -89,12 +88,18 @@ func Compare(a Version, b Version) int {
 		}
 	}
 
-	// compare pre release metadata
+	if a.IsRelease() && !b.IsRelease() {
+		return +1
+	}
+	if b.IsRelease() && !a.IsRelease() {
+		return -1
+	}
+
 	for i := 0; i < max(len(a.PreRelease), len(b.PreRelease)); i++ {
-		if i >= len(a.PreRelease) && i < len(b.PreRelease) {
+		if i < len(a.PreRelease) && i >= len(b.PreRelease) {
 			return +1
 		}
-		if i >= len(b.PreRelease) && i < len(a.PreRelease) {
+		if i < len(b.PreRelease) && i >= len(a.PreRelease) {
 			return -1
 		}
 		result := strings.Compare(a.PreRelease[i], b.PreRelease[i])

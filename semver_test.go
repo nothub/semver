@@ -377,12 +377,12 @@ func TestCompare(t *testing.T) {
 		{
 			a:        "1.0.0-a.b",
 			b:        "1.0.0-a.b.c",
-			expected: +1,
+			expected: -1,
 		},
 		{
 			a:        "1.0.0-a.b.c",
 			b:        "1.0.0-a.b",
-			expected: -1,
+			expected: +1,
 		},
 		{
 			a:        "1.0.0",
@@ -392,12 +392,12 @@ func TestCompare(t *testing.T) {
 		{
 			a:        "1.0.0-a.b.c+foo",
 			b:        "1.0.0-a.b",
-			expected: -1,
+			expected: +1,
 		},
 		{
 			a:        "1.0.0-a.b.c",
 			b:        "1.0.0-a.b+foo.bar",
-			expected: -1,
+			expected: +1,
 		},
 		{
 			a:        "1.0.0-alpha",
