@@ -384,6 +384,21 @@ func TestCompare(t *testing.T) {
 			b:        "1.0.0-a.b",
 			expected: -1,
 		},
+		{
+			a:        "1.0.0",
+			b:        "1.0.0",
+			expected: 0,
+		},
+		{
+			a:        "1.0.0-a.b.c+foo",
+			b:        "1.0.0-a.b",
+			expected: -1,
+		},
+		{
+			a:        "1.0.0-a.b.c",
+			b:        "1.0.0-a.b+foo.bar",
+			expected: -1,
+		},
 	}
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("%s %s", test.a, test.b), func(t *testing.T) {
