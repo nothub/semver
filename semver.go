@@ -75,6 +75,7 @@ func (a Version) Same(b Version) bool {
 //	a newer than b: +1
 //	a is same as b:  0
 func Compare(a Version, b Version) int {
+	// compare version core
 	for _, result := range []int{
 		strings.Compare(a.Major, b.Major),
 		strings.Compare(a.Minor, b.Minor),
@@ -88,6 +89,7 @@ func Compare(a Version, b Version) int {
 		}
 	}
 
+	// release versions have precedence
 	if a.IsRelease() && !b.IsRelease() {
 		return +1
 	}
@@ -96,15 +98,36 @@ func Compare(a Version, b Version) int {
 	}
 
 	for i := 0; i < max(len(a.PreRelease), len(b.PreRelease)); i++ {
+		// a larger set of pre-release data has a higher precedence
+		// (if all the preceding identifiers are equal)
 		if i < len(a.PreRelease) && i >= len(b.PreRelease) {
 			return +1
 		}
 		if i < len(b.PreRelease) && i >= len(a.PreRelease) {
 			return -1
 		}
-		result := strings.Compare(a.PreRelease[i], b.PreRelease[i])
-		if result != 0 {
-			return result
+
+		if isDigits(a.PreRelease[i]) && isDigits(b.PreRelease[i]) {
+			// identifiers consisting of only digits are compared numerically
+			if len(a.PreRelease[i]) > len(b.PreRelease[i]) {
+				return +1
+			}
+			if len(a.PreRelease[i]) < len(b.PreRelease[i]) {
+				return -1
+			}
+			// same length, compare strings digit by digit
+			for j := range a.PreRelease[i] {
+				result := strings.Compare(a.PreRelease[i][j:j+1], b.PreRelease[i][j:j+1])
+				if result != 0 {
+					return result
+				}
+			}
+		} else {
+			// identifiers with letters or hyphens are compared lexically in ASCII sort order
+			result := strings.Compare(a.PreRelease[i], b.PreRelease[i])
+			if result != 0 {
+				return result
+			}
 		}
 	}
 
