@@ -50,84 +50,56 @@ func Parse(str string) (Version, error) {
 // Newer returns true if a is newer than b.
 // Build metadata is ignored in this comparison.
 func (a Version) Newer(b Version) bool {
-	if a.Major != b.Major {
-		return false
-	}
-	if a.Minor != b.Minor {
-		return false
-	}
-	if a.Patch != b.Patch {
-		return false
-	}
-
-	strings.Compare(strings.Join(a.PreRelease, ""), strings.Join(b.PreRelease, ""))
-
-	return true
+	return Compare(a, b) > 0
 }
 
 // Older returns true if a is older than b.
 // Build metadata is ignored in this comparison.
 func (a Version) Older(b Version) bool {
-	if a.Major < b.Major {
-		return true
-	}
-	if a.Minor < b.Minor {
-		return true
-	}
-	if a.Patch < b.Patch {
-		return true
-	}
-
-	// TODO:
-	//   Precedence for two pre-release versions with the same major, minor, and patch version MUST be determined by comparing each dot separated identifier from left to right until a difference is found as follows:
-	//    1. Identifiers consisting of only digits are compared numerically.
-	//    2. Identifiers with letters or hyphens are compared lexically in ASCII sort order.
-	//    3. Numeric identifiers always have lower precedence than non-numeric identifiers.
-	//    4. A larger set of pre-release fields has a higher precedence than a smaller set, if all of the preceding identifiers are equal.
-
-	return false
+	return Compare(a, b) < 0
 }
 
 // Same returns true if a and b are equal.
 // Build metadata is ignored in this comparison.
 func (a Version) Same(b Version) bool {
-	if a.Major != b.Major {
-		return false
-	}
-	if a.Minor != b.Minor {
-		return false
-	}
-	if a.Patch != b.Patch {
-		return false
-	}
-
-	if len(a.PreRelease) != len(b.PreRelease) {
-		return false
-	}
-	for i := range a.PreRelease {
-		if a.PreRelease[i] != b.PreRelease[i] {
-			return false
-		}
-	}
-
-	return true
+	return Compare(a, b) == 0
 }
 
 // Compare returns an integer comparing two Version objects.
 //
-//	a is same as b:  0
 //	a older than b: -1
 //	a newer than b: +1
+//	a is same as b:  0
 func Compare(a Version, b Version) int {
-	if a.Older(b) {
-		return -1
+	// compare version core
+	for _, result := range []int{
+		strings.Compare(a.Major, b.Major),
+		strings.Compare(a.Minor, b.Minor),
+		strings.Compare(a.Patch, b.Patch),
+	} {
+		switch result {
+		case +1:
+			return +1
+		case -1:
+			return -1
+		}
 	}
 
-	if a.Newer(b) {
-		return 1
+	// compare pre release metadata
+	for i := 0; i < max(len(a.PreRelease), len(b.PreRelease)); i++ {
+		if i >= len(a.PreRelease) && i < len(b.PreRelease) {
+			return +1
+		}
+		if i >= len(b.PreRelease) && i < len(a.PreRelease) {
+			return -1
+		}
+		result := strings.Compare(a.PreRelease[i], b.PreRelease[i])
+		if result != 0 {
+			return result
+		}
 	}
 
-	// implies: a.Same(b) == true
+	// versions are equal
 	return 0
 }
 
