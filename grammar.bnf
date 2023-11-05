@@ -1,57 +1,57 @@
-<valid semver> ::= <version core>
-                 | <version core> "-" <pre-release>
-                 | <version core> "+" <build>
-                 | <version core> "-" <pre-release> "+" <build>
+<valid_semver> ::= <version_core>
+                 | <version_core> "-" <pre_release>
+                 | <version_core> "+" <build>
+                 | <version_core> "-" <pre_release> "+" <build>
 
-<version core> ::= <major> "." <minor> "." <patch>
+<version_core> ::= <major> "." <minor> "." <patch>
 
-<major> ::= <numeric identifier>
+<major> ::= <numeric_identifier>
 
-<minor> ::= <numeric identifier>
+<minor> ::= <numeric_identifier>
 
-<patch> ::= <numeric identifier>
+<patch> ::= <numeric_identifier>
 
-<pre-release> ::= <dot-separated pre-release identifiers>
+<pre_release> ::= <dot_separated_pre_release_identifiers>
 
-<dot-separated pre-release identifiers> ::= <pre-release identifier>
-                                          | <pre-release identifier> "." <dot-separated pre-release identifiers>
+<dot_separated_pre_release_identifiers> ::= <pre_release_identifier>
+                                          | <pre_release_identifier> "." <dot_separated_pre_release_identifiers>
 
-<build> ::= <dot-separated build identifiers>
+<build> ::= <dot_separated_build_identifiers>
 
-<dot-separated build identifiers> ::= <build identifier>
-                                    | <build identifier> "." <dot-separated build identifiers>
+<dot_separated_build_identifiers> ::= <build_identifier>
+                                    | <build_identifier> "." <dot_separated_build_identifiers>
 
-<pre-release identifier> ::= <alphanumeric identifier>
-                           | <numeric identifier>
+<pre_release_identifier> ::= <alphanumeric_identifier>
+                           | <numeric_identifier>
 
-<build identifier> ::= <alphanumeric identifier>
+<build_identifier> ::= <alphanumeric_identifier>
                      | <digits>
 
-<alphanumeric identifier> ::= <non-digit>
-                            | <non-digit> <identifier characters>
-                            | <identifier characters> <non-digit>
-                            | <identifier characters> <non-digit> <identifier characters>
+<alphanumeric_identifier> ::= <non_digit>
+                            | <non_digit> <identifier_characters>
+                            | <identifier_characters> <non_digit>
+                            | <identifier_characters> <non_digit> <identifier_characters>
 
-<numeric identifier> ::= "0"
-                       | <positive digit>
-                       | <positive digit> <digits>
+<numeric_identifier> ::= "0"
+                       | <positive_digit>
+                       | <positive_digit> <digits>
 
-<identifier characters> ::= <identifier character>
-                          | <identifier character> <identifier characters>
+<identifier_characters> ::= <identifier_character>
+                          | <identifier_character> <identifier_characters>
 
-<identifier character> ::= <digit>
-                         | <non-digit>
+<identifier_character> ::= <digit>
+                         | <non_digit>
 
-<non-digit> ::= <letter>
+<non_digit> ::= <letter>
               | "-"
 
 <digits> ::= <digit>
            | <digit> <digits>
 
 <digit> ::= "0"
-          | <positive digit>
+          | <positive_digit>
 
-<positive digit> ::= "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+<positive_digit> ::= "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
 
 <letter> ::= "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J"
            | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T"
