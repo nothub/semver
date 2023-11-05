@@ -152,3 +152,12 @@ func (v Version) String() string {
 	}
 	return sb.String()
 }
+
+func isDigits(s string) bool {
+	for _, r := range s {
+		if r < '0' || r > '9' {
+			return false
+		}
+	}
+	return true
+}
