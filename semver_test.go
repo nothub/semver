@@ -2,6 +2,7 @@ package semver
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -183,6 +184,25 @@ func TestParseValids(t *testing.T) {
 				PreRelease: []string{"0A", "is", "legal"},
 			},
 		},
+		{
+			input: "9.8.7-whatever+meta",
+			expected: Version{
+				Major:      "9",
+				Minor:      "8",
+				Patch:      "7",
+				PreRelease: []string{"whatever"},
+				Build:      []string{"meta"},
+			},
+		},
+		{
+			input: "9.8.7+whatever-meta",
+			expected: Version{
+				Major: "9",
+				Minor: "8",
+				Patch: "7",
+				Build: []string{"whatever-meta"},
+			},
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.input, func(t *testing.T) {
@@ -297,6 +317,81 @@ func TestVersion_Equals(t *testing.T) {
 		t.Run(test.a.String(), func(t *testing.T) {
 			if test.a.Same(test.b) != test.equals {
 				t.Error("should equal")
+				return
+			}
+		})
+	}
+}
+
+func TestCompare(t *testing.T) {
+	tests := []struct {
+		a        string
+		b        string
+		expected int
+	}{
+		{
+			a:        "2.0.0",
+			b:        "1.0.0",
+			expected: +1,
+		},
+		{
+			a:        "1.0.0",
+			b:        "2.0.0",
+			expected: -1,
+		},
+		{
+			a:        "0.1.1",
+			b:        "0.1.0",
+			expected: +1,
+		},
+		{
+			a:        "0.1.0",
+			b:        "0.1.1",
+			expected: -1,
+		},
+		{
+			a:        "1.1.1",
+			b:        "1.1.1",
+			expected: 0,
+		},
+		{
+			a:        "1.0.0",
+			b:        "1.0.0-alpha",
+			expected: +1,
+		},
+		{
+			a:        "1.0.0-alpha",
+			b:        "1.0.0",
+			expected: -1,
+		},
+		{
+			a:        "1.0.0-a",
+			b:        "1.0.0-b",
+			expected: -1,
+		},
+		{
+			a:        "1.0.0-c",
+			b:        "1.0.0-c",
+			expected: 0,
+		},
+		{
+			a:        "1.0.0-a.b",
+			b:        "1.0.0-a.b.c",
+			expected: +1,
+		},
+		{
+			a:        "1.0.0-a.b.c",
+			b:        "1.0.0-a.b",
+			expected: -1,
+		},
+	}
+	for _, test := range tests {
+		t.Run(fmt.Sprintf("%s %s", test.a, test.b), func(t *testing.T) {
+			a, _ := Parse(test.a)
+			b, _ := Parse(test.b)
+			result := Compare(a, b)
+			if test.expected != result {
+				t.Errorf("unexpected result:\nexpected = %+v\nactual   = %+v", test.expected, result)
 				return
 			}
 		})
