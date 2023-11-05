@@ -264,6 +264,8 @@ func TestParseInvalids(t *testing.T) {
 		"9.8.7-whatever+meta+meta",
 		"99999999999999999999999.999999999999999999.99999999999999999----RC-SNAPSHOT.12.09.1--------------------------------..12",
 		"1.0.0-0A..is..illegal",
+		"1.0.0-a.01",
+		"1.0.0-a.010",
 	}
 	for _, test := range tests {
 		t.Run(test, func(t *testing.T) {
@@ -452,8 +454,16 @@ func TestCompare(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("%s %s", test.a, test.b), func(t *testing.T) {
-			a, _ := Parse(test.a)
-			b, _ := Parse(test.b)
+			a, err := Parse(test.a)
+			if err != nil {
+				t.Errorf("unexpected error: %s", err)
+				return
+			}
+			b, err := Parse(test.b)
+			if err != nil {
+				t.Errorf("unexpected error: %s", err)
+				return
+			}
 			result := Compare(a, b)
 			if test.expected != result {
 				t.Errorf("unexpected result:\nexpected = %+v\nactual   = %+v", test.expected, result)
