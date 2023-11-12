@@ -71,18 +71,27 @@ func (a Version) Same(b Version) bool {
 
 // Compare returns an integer comparing two Version objects.
 //
-//	a older than b: -1
-//	a newer than b: +1
-//	a is same as b:  0
+//	a, _ := Parse("1.2.3")
+//	b, _ := Parse("2.0.0")
+//	Compare(a, a) ->  0 (a older than b)
+//	Compare(a, b) -> -1 (a newer than b)
+//	Compare(b, a) -> +1 (a is same as b)
 //
 // Build metadata is ignored in this comparison.
 func Compare(a Version, b Version) int {
-	// compare version core
-	for _, result := range []int{
+	result := compareVersionCore([]int{
 		strings.Compare(a.Major, b.Major),
 		strings.Compare(a.Minor, b.Minor),
 		strings.Compare(a.Patch, b.Patch),
-	} {
+	})
+	if result != 0 {
+		return result
+	}
+	return comparePreRelease(a, b)
+}
+
+func compareVersionCore(core []int) int {
+	for _, result := range core {
 		switch result {
 		case +1:
 			return +1
@@ -90,8 +99,7 @@ func Compare(a Version, b Version) int {
 			return -1
 		}
 	}
-
-	return comparePreRelease(a, b)
+	return 0
 }
 
 func comparePreRelease(a Version, b Version) int {
