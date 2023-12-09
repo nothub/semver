@@ -4,7 +4,7 @@ package example
 
 import (
 	"fmt"
-	"github.com/nothub/semver"
+	"hub.lol/semver"
 )
 
 func main() {
