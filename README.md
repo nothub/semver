@@ -1,5 +1,5 @@
 # semver
 
-[![go pkg](https://pkg.go.dev/badge/hub.lol/semver.svg)](https://pkg.go.dev/hub.lol/semver)
+[![go pkg](https://pkg.go.dev/badge/github.com/nothub/semver.svg)](https://pkg.go.dev/github.com/nothub/semver)
 
 A tiny library for parsing and comparing semver.

@@ -1,3 +1,3 @@
-module hub.lol/semver
+module github.com/nothub/semver
 
-go 1.21
+go 1.22
