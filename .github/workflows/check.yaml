@@ -5,10 +5,11 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5.0.0
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
           check-latest: true
           cache: true
-      - run: |
-          go test -v
+      - run: go test -v -vet='all' ./...
