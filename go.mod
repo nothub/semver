@@ -1,3 +1,3 @@
-module git.sr.ht/~hub/semver
+module github.com/nothub/semver
 
 go 1.22
