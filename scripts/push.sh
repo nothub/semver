@@ -6,7 +6,7 @@ push() {
     if ! git remote get-url "${1}" 1> /dev/null 2> /dev/null; then
         git remote add "${1}" "${2}"
     fi
-    git push "${1}" main
+    git push --tags "${1}" main
 }
 
 cd "$(dirname "$(realpath "$0")")/.."
