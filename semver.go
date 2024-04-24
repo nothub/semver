@@ -3,6 +3,7 @@ package semver
 import (
 	"errors"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -45,6 +46,18 @@ func Parse(str string) (Version, error) {
 	}
 
 	return ver, nil
+}
+
+func (v *Version) MajorInt() (int, error) {
+	return strconv.Atoi(v.Major)
+}
+
+func (v *Version) MinorInt() (int, error) {
+	return strconv.Atoi(v.Minor)
+}
+
+func (v *Version) PatchInt() (int, error) {
+	return strconv.Atoi(v.Patch)
 }
 
 func (v Version) IsRelease() bool {
