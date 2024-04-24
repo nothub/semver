@@ -60,26 +60,26 @@ func (v *Version) PatchInt() (int, error) {
 	return strconv.Atoi(v.Patch)
 }
 
-func (v Version) IsRelease() bool {
+func (v *Version) IsRelease() bool {
 	return len(v.PreRelease) == 0
 }
 
 // Newer returns true if a is newer than b.
 // Build metadata is ignored in this comparison.
-func (a Version) Newer(b Version) bool {
-	return Compare(a, b) == +1
+func (a *Version) Newer(b Version) bool {
+	return Compare(*a, b) == +1
 }
 
 // Older returns true if a is older than b.
 // Build metadata is ignored in this comparison.
-func (a Version) Older(b Version) bool {
-	return Compare(a, b) == -1
+func (a *Version) Older(b Version) bool {
+	return Compare(*a, b) == -1
 }
 
 // Same returns true if a and b are equal.
 // Build metadata is ignored in this comparison.
-func (a Version) Same(b Version) bool {
-	return Compare(a, b) == 0
+func (a *Version) Same(b Version) bool {
+	return Compare(*a, b) == 0
 }
 
 // Compare returns an integer comparing two Version objects.
@@ -163,7 +163,7 @@ func comparePreRelease(a Version, b Version) int {
 	return 0
 }
 
-func (v Version) String() string {
+func (v *Version) String() string {
 	sb := strings.Builder{}
 	sb.WriteString(v.Major)
 	sb.WriteString(".")
