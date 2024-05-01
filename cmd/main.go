@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/nothub/semver"
@@ -63,23 +62,11 @@ func next() {
 
 	switch strings.ToLower(flag.Arg(1)) {
 	case "major":
-		i, err := ver.MajorInt()
-		if err != nil {
-			log.Fatalln(err)
-		}
-		ver.Major = strconv.Itoa(i + 1)
+		ver.Major = ver.Major + 1
 	case "minor":
-		i, err := ver.MinorInt()
-		if err != nil {
-			log.Fatalln(err)
-		}
-		ver.Minor = strconv.Itoa(i + 1)
+		ver.Minor = ver.Minor + 1
 	case "patch":
-		i, err := ver.PatchInt()
-		if err != nil {
-			log.Fatalln(err)
-		}
-		ver.Patch = strconv.Itoa(i + 1)
+		ver.Patch = ver.Patch + 1
 	default:
 		log.Print(usage)
 		os.Exit(1)

@@ -9,11 +9,11 @@ import (
 
 type Version struct {
 	// incompatible API changes
-	Major string
+	Major int
 	// backward compatible functionality
-	Minor string
+	Minor int
 	// backward compatible bug fixes
-	Patch string
+	Patch int
 
 	// pre-release metadata
 	PreRelease []string
@@ -26,6 +26,9 @@ var ErrInvalid = errors.New("invalid semver string")
 // https://regex101.com/r/vkijKf/1/
 var Regex = regexp.MustCompile("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$")
 
+// Parse will attempts to convert a string to a semver.Version struct.
+//
+// Parse might return semver.ErrInvalid, strconv.ErrRange or strconv.ErrSyntax.
 func Parse(str string) (Version, error) {
 	var ver Version
 
@@ -34,9 +37,19 @@ func Parse(str string) (Version, error) {
 		return ver, ErrInvalid
 	}
 
-	ver.Major = m[1]
-	ver.Minor = m[2]
-	ver.Patch = m[3]
+	var err error
+	ver.Major, err = strconv.Atoi(m[1])
+	if err != nil {
+		return ver, err
+	}
+	ver.Minor, err = strconv.Atoi(m[2])
+	if err != nil {
+		return ver, err
+	}
+	ver.Patch, err = strconv.Atoi(m[3])
+	if err != nil {
+		return ver, err
+	}
 
 	if len(m[4]) > 0 {
 		ver.PreRelease = strings.Split(m[4], ".")
@@ -46,18 +59,6 @@ func Parse(str string) (Version, error) {
 	}
 
 	return ver, nil
-}
-
-func (v *Version) MajorInt() (int, error) {
-	return strconv.Atoi(v.Major)
-}
-
-func (v *Version) MinorInt() (int, error) {
-	return strconv.Atoi(v.Minor)
-}
-
-func (v *Version) PatchInt() (int, error) {
-	return strconv.Atoi(v.Patch)
 }
 
 func (v *Version) IsRelease() bool {
@@ -93,14 +94,24 @@ func (a *Version) Same(b Version) bool {
 // Build metadata is ignored in this comparison.
 func Compare(a Version, b Version) int {
 	result := compareVersionCore([]int{
-		strings.Compare(a.Major, b.Major),
-		strings.Compare(a.Minor, b.Minor),
-		strings.Compare(a.Patch, b.Patch),
+		compareInt(a.Major, b.Major),
+		compareInt(a.Minor, b.Minor),
+		compareInt(a.Patch, b.Patch),
 	})
 	if result != 0 {
 		return result
 	}
 	return comparePreRelease(a, b)
+}
+
+func compareInt(a int, b int) int {
+	if a < b {
+		return -1
+	}
+	if a > b {
+		return +1
+	}
+	return 0
 }
 
 func compareVersionCore(core []int) int {
@@ -165,11 +176,11 @@ func comparePreRelease(a Version, b Version) int {
 
 func (v *Version) String() string {
 	sb := strings.Builder{}
-	sb.WriteString(v.Major)
+	sb.WriteString(strconv.Itoa(v.Major))
 	sb.WriteString(".")
-	sb.WriteString(v.Minor)
+	sb.WriteString(strconv.Itoa(v.Minor))
 	sb.WriteString(".")
-	sb.WriteString(v.Patch)
+	sb.WriteString(strconv.Itoa(v.Patch))
 	if len(v.PreRelease) > 0 {
 		sb.WriteString("-")
 		sb.WriteString(strings.Join(v.PreRelease, "."))

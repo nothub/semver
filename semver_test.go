@@ -3,7 +3,9 @@ package semver
 import (
 	"errors"
 	"fmt"
+	"math"
 	"reflect"
+	"strconv"
 	"testing"
 )
 
@@ -15,25 +17,25 @@ func TestParseValids(t *testing.T) {
 		{
 			input: "0.0.4",
 			expected: Version{
-				Major: "0",
-				Minor: "0",
-				Patch: "4",
+				Major: 0,
+				Minor: 0,
+				Patch: 4,
 			},
 		},
 		{
 			input: "10.20.30",
 			expected: Version{
-				Major: "10",
-				Minor: "20",
-				Patch: "30",
+				Major: 10,
+				Minor: 20,
+				Patch: 30,
 			},
 		},
 		{
 			input: "1.1.2-prerelease+meta",
 			expected: Version{
-				Major:      "1",
-				Minor:      "1",
-				Patch:      "2",
+				Major:      1,
+				Minor:      1,
+				Patch:      2,
 				PreRelease: []string{"prerelease"},
 				Build:      []string{"meta"},
 			},
@@ -41,63 +43,63 @@ func TestParseValids(t *testing.T) {
 		{
 			input: "1.1.2+meta",
 			expected: Version{
-				Major: "1",
-				Minor: "1",
-				Patch: "2",
+				Major: 1,
+				Minor: 1,
+				Patch: 2,
 				Build: []string{"meta"},
 			},
 		},
 		{
 			input: "1.1.2+meta-valid",
 			expected: Version{
-				Major: "1",
-				Minor: "1",
-				Patch: "2",
+				Major: 1,
+				Minor: 1,
+				Patch: 2,
 				Build: []string{"meta-valid"},
 			},
 		},
 		{
 			input: "1.0.0-alpha",
 			expected: Version{
-				Major:      "1",
-				Minor:      "0",
-				Patch:      "0",
+				Major:      1,
+				Minor:      0,
+				Patch:      0,
 				PreRelease: []string{"alpha"},
 			},
 		},
 		{
 			input: "1.0.0-alpha.beta.1",
 			expected: Version{
-				Major:      "1",
-				Minor:      "0",
-				Patch:      "0",
+				Major:      1,
+				Minor:      0,
+				Patch:      0,
 				PreRelease: []string{"alpha", "beta", "1"},
 			},
 		},
 		{
 			input: "1.0.0-alpha.beta",
 			expected: Version{
-				Major:      "1",
-				Minor:      "0",
-				Patch:      "0",
+				Major:      1,
+				Minor:      0,
+				Patch:      0,
 				PreRelease: []string{"alpha", "beta"},
 			},
 		},
 		{
 			input: "1.0.0-alpha.0valid",
 			expected: Version{
-				Major:      "1",
-				Minor:      "0",
-				Patch:      "0",
+				Major:      1,
+				Minor:      0,
+				Patch:      0,
 				PreRelease: []string{"alpha", "0valid"},
 			},
 		},
 		{
 			input: "1.0.0-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay",
 			expected: Version{
-				Major:      "1",
-				Minor:      "0",
-				Patch:      "0",
+				Major:      1,
+				Minor:      0,
+				Patch:      0,
 				PreRelease: []string{"alpha-a", "b-c-somethinglong"},
 				Build:      []string{"build", "1-aef", "1-its-okay"},
 			},
@@ -105,36 +107,36 @@ func TestParseValids(t *testing.T) {
 		{
 			input: "10.2.3-DEV-SNAPSHOT",
 			expected: Version{
-				Major:      "10",
-				Minor:      "2",
-				Patch:      "3",
+				Major:      10,
+				Minor:      2,
+				Patch:      3,
 				PreRelease: []string{"DEV-SNAPSHOT"},
 			},
 		},
 		{
 			input: "2.0.0+build.1848",
 			expected: Version{
-				Major: "2",
-				Minor: "0",
-				Patch: "0",
+				Major: 2,
+				Minor: 0,
+				Patch: 0,
 				Build: []string{"build", "1848"},
 			},
 		},
 		{
 			input: "2.0.1-alpha.1227",
 			expected: Version{
-				Major:      "2",
-				Minor:      "0",
-				Patch:      "1",
+				Major:      2,
+				Minor:      0,
+				Patch:      1,
 				PreRelease: []string{"alpha", "1227"},
 			},
 		},
 		{
 			input: "1.2.3----RC-SNAPSHOT.12.9.1--.12+788",
 			expected: Version{
-				Major:      "1",
-				Minor:      "2",
-				Patch:      "3",
+				Major:      1,
+				Minor:      2,
+				Patch:      3,
 				PreRelease: []string{"---RC-SNAPSHOT", "12", "9", "1--", "12"},
 				Build:      []string{"788"},
 			},
@@ -142,18 +144,18 @@ func TestParseValids(t *testing.T) {
 		{
 			input: "1.2.3----RC-SNAPSHOT.12.9.1--.12",
 			expected: Version{
-				Major:      "1",
-				Minor:      "2",
-				Patch:      "3",
+				Major:      1,
+				Minor:      2,
+				Patch:      3,
 				PreRelease: []string{"---RC-SNAPSHOT", "12", "9", "1--", "12"},
 			},
 		},
 		{
 			input: "1.2.3----R-S.12.9.1--.12+meta",
 			expected: Version{
-				Major:      "1",
-				Minor:      "2",
-				Patch:      "3",
+				Major:      1,
+				Minor:      2,
+				Patch:      3,
 				PreRelease: []string{"---R-S", "12", "9", "1--", "12"},
 				Build:      []string{"meta"},
 			},
@@ -161,35 +163,27 @@ func TestParseValids(t *testing.T) {
 		{
 			input: "1.0.0+0.build.1-rc.10000aaa-kk-0.1",
 			expected: Version{
-				Major: "1",
-				Minor: "0",
-				Patch: "0",
+				Major: 1,
+				Minor: 0,
+				Patch: 0,
 				Build: []string{"0", "build", "1-rc", "10000aaa-kk-0", "1"},
-			},
-		},
-		{
-			input: "99999999999999999999999.999999999999999999.99999999999999999",
-			expected: Version{
-				Major: "99999999999999999999999",
-				Minor: "999999999999999999",
-				Patch: "99999999999999999",
 			},
 		},
 		{
 			input: "1.0.0-0A.is.legal",
 			expected: Version{
-				Major:      "1",
-				Minor:      "0",
-				Patch:      "0",
+				Major:      1,
+				Minor:      0,
+				Patch:      0,
 				PreRelease: []string{"0A", "is", "legal"},
 			},
 		},
 		{
 			input: "9.8.7-whatever+meta",
 			expected: Version{
-				Major:      "9",
-				Minor:      "8",
-				Patch:      "7",
+				Major:      9,
+				Minor:      8,
+				Patch:      7,
 				PreRelease: []string{"whatever"},
 				Build:      []string{"meta"},
 			},
@@ -197,9 +191,9 @@ func TestParseValids(t *testing.T) {
 		{
 			input: "9.8.7+whatever-meta",
 			expected: Version{
-				Major: "9",
-				Minor: "8",
-				Patch: "7",
+				Major: 9,
+				Minor: 8,
+				Patch: 7,
 				Build: []string{"whatever-meta"},
 			},
 		},
@@ -282,6 +276,19 @@ func TestParseInvalids(t *testing.T) {
 	}
 }
 
+func TestParseOverflow(t *testing.T) {
+	var test = fmt.Sprintf("0.0.%s", strconv.Itoa(math.MaxInt)+"0")
+	_, err := Parse(test)
+	if err == nil {
+		t.Error("should error")
+		return
+	}
+	if !errors.Is(err, strconv.ErrRange) {
+		t.Errorf("unexpected error = %s", err)
+		return
+	}
+}
+
 func TestVersion_Equals(t *testing.T) {
 	tests := []struct {
 		a      Version
@@ -290,27 +297,27 @@ func TestVersion_Equals(t *testing.T) {
 	}{
 		{
 			a: Version{
-				Major: "0",
-				Minor: "1",
-				Patch: "0",
+				Major: 0,
+				Minor: 1,
+				Patch: 0,
 			},
 			b: Version{
-				Major: "0",
-				Minor: "1",
-				Patch: "0",
+				Major: 0,
+				Minor: 1,
+				Patch: 0,
 			},
 			equals: true,
 		},
 		{
 			a: Version{
-				Major: "0",
-				Minor: "1",
-				Patch: "1",
+				Major: 0,
+				Minor: 1,
+				Patch: 1,
 			},
 			b: Version{
-				Major: "0",
-				Minor: "1",
-				Patch: "0",
+				Major: 0,
+				Minor: 1,
+				Patch: 0,
 			},
 			equals: false,
 		},
@@ -442,13 +449,13 @@ func TestCompare(t *testing.T) {
 			expected: -1,
 		},
 		{
-			a:        "99999999999999999999999.99999999999999999999999.99999999999999999999999-a.99999999999999999999999",
-			b:        "99999999999999999999999.99999999999999999999999.99999999999999999999999-a.888888888888888888888888",
+			a:        "420.69.1337-a.99999999999999999999999",
+			b:        "420.69.1337-a.888888888888888888888888",
 			expected: -1,
 		},
 		{
-			a:        "99999999999999999999999.99999999999999999999999.99999999999999999999999-a.99999999999999999999998",
-			b:        "99999999999999999999999.99999999999999999999999.99999999999999999999999-a.99999999999999999999999",
+			a:        "420.69.1337-a.99999999999999999999998",
+			b:        "420.69.1337-a.99999999999999999999999",
 			expected: -1,
 		},
 	}
