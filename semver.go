@@ -61,6 +61,7 @@ func Parse(str string) (Version, error) {
 	return ver, nil
 }
 
+// IsRelease returns true if Version contains no pre-release metadata.
 func (v *Version) IsRelease() bool {
 	return len(v.PreRelease) == 0
 }
@@ -174,6 +175,7 @@ func comparePreRelease(a Version, b Version) int {
 	return 0
 }
 
+// String will build and return the string representation of Version.
 func (v *Version) String() string {
 	sb := strings.Builder{}
 	sb.WriteString(strconv.Itoa(v.Major))
