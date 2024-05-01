@@ -476,6 +476,20 @@ func TestCompare(t *testing.T) {
 				t.Errorf("unexpected result:\nexpected = %+v\nactual   = %+v", test.expected, result)
 				return
 			}
+			switch result {
+			case +1:
+				if !a.Newer(b) {
+					t.Error("util wrapper Newer() is broken")
+				}
+			case -1:
+				if !a.Older(b) {
+					t.Error("util wrapper Older() is broken")
+				}
+			case 0:
+				if !a.Same(b) {
+					t.Error("util wrapper Same() is broken")
+				}
+			}
 		})
 	}
 }
@@ -509,76 +523,6 @@ func TestVersion_IsRelease(t *testing.T) {
 			}
 			if got := v.IsRelease(); got != tt.want {
 				t.Errorf("IsRelease() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestVersion_Newer(t *testing.T) {
-	type fields struct {
-		Major      int
-		Minor      int
-		Patch      int
-		PreRelease []string
-		Build      []string
-	}
-	type args struct {
-		b Version
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		want   bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			a := &Version{
-				Major:      tt.fields.Major,
-				Minor:      tt.fields.Minor,
-				Patch:      tt.fields.Patch,
-				PreRelease: tt.fields.PreRelease,
-				Build:      tt.fields.Build,
-			}
-			if got := a.Newer(tt.args.b); got != tt.want {
-				t.Errorf("Newer() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestVersion_Older(t *testing.T) {
-	type fields struct {
-		Major      int
-		Minor      int
-		Patch      int
-		PreRelease []string
-		Build      []string
-	}
-	type args struct {
-		b Version
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		want   bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			a := &Version{
-				Major:      tt.fields.Major,
-				Minor:      tt.fields.Minor,
-				Patch:      tt.fields.Patch,
-				PreRelease: tt.fields.PreRelease,
-				Build:      tt.fields.Build,
-			}
-			if got := a.Older(tt.args.b); got != tt.want {
-				t.Errorf("Older() = %v, want %v", got, tt.want)
 			}
 		})
 	}
