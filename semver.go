@@ -24,7 +24,7 @@ type Version struct {
 var ErrInvalid = errors.New("invalid semver string")
 
 // https://regex101.com/r/vkijKf/1/
-var Regex = regexp.MustCompile("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$")
+var regex = regexp.MustCompile("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$")
 
 // Parse will attempts to convert a string to a semver.Version struct.
 //
@@ -32,7 +32,7 @@ var Regex = regexp.MustCompile("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?
 func Parse(str string) (Version, error) {
 	var ver Version
 
-	m := Regex.FindStringSubmatch(str)
+	m := regex.FindStringSubmatch(str)
 	if m == nil {
 		return ver, ErrInvalid
 	}
@@ -105,11 +105,11 @@ func Compare(a Version, b Version) int {
 }
 
 func compareInt(a int, b int) int {
-	if a < b {
-		return -1
-	}
 	if a > b {
 		return +1
+	}
+	if a < b {
+		return -1
 	}
 	return 0
 }
