@@ -18,7 +18,7 @@ jobs:
       - uses: tj-actions/coverage-badge-go@v2
         with:
           filename: coverage.out
-      - uses: tj-actions/verify-changed-files@v16
+      - uses: tj-actions/verify-changed-files@v17
         id: verify-changed-files
         with:
           files: README.md
