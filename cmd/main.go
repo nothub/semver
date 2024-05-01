@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -25,43 +26,57 @@ Commands:
     Usage: semver [opts...] valid <version>
 `
 
+var errUsage = errors.New("invalid usage")
+
 func main() {
 	log.SetFlags(0)
 
-	checkArgs(1)
-	if os.Args[1] == "-h" || os.Args[1] == "--help" {
+	args := os.Args[1:]
+
+	mustLen(args, 1)
+	if args[0] == "-h" || args[0] == "--help" {
 		fmt.Print(usage)
 		os.Exit(0)
 	}
 
-	cmd := strings.ToLower(os.Args[1])
-	switch strings.ToLower(cmd) {
+	cmd := strings.ToLower(args[0])
+	args = args[1:]
+
+	var err error
+	switch cmd {
 	case "next":
-		checkArgs(2)
-		next(os.Args[2], os.Args[3])
+		mustLen(args, 2)
+		err = next(args[0], args[1])
 	case "strip":
-		checkArgs(2)
-		strip(os.Args[2], os.Args[3])
+		mustLen(args, 2)
+		err = strip(args[0], args[1])
 	case "valid":
-		checkArgs(1)
-		valid(os.Args[2])
+		mustLen(args, 1)
+		err = valid(args[0])
 	default:
+		err = errUsage
+	}
+	if err != nil {
+		if errors.Is(err, errUsage) {
+			log.Print(usage)
+			os.Exit(1)
+		} else {
+			log.Fatalln(err.Error())
+		}
+	}
+}
+
+func mustLen(args []string, minLen int) {
+	if len(args) < minLen {
 		log.Print(usage)
 		os.Exit(1)
 	}
 }
 
-func checkArgs(min int) {
-	if len(os.Args) < (min + 1) {
-		log.Print(usage)
-		os.Exit(1)
-	}
-}
-
-func next(mode string, str string) {
+func next(mode string, str string) error {
 	ver, err := semver.Parse(str)
 	if err != nil {
-		log.Fatalln(err)
+		return err
 	}
 
 	switch strings.ToLower(mode) {
@@ -72,17 +87,17 @@ func next(mode string, str string) {
 	case "patch":
 		ver.Patch = ver.Patch + 1
 	default:
-		log.Print(usage)
-		os.Exit(1)
+		return errUsage
 	}
 
 	fmt.Print(ver.String())
+	return nil
 }
 
-func strip(mode string, str string) {
+func strip(mode string, str string) error {
 	ver, err := semver.Parse(str)
 	if err != nil {
-		log.Fatalln(err)
+		return err
 	}
 
 	switch strings.ToLower(mode) {
@@ -94,16 +109,14 @@ func strip(mode string, str string) {
 	case "build":
 		ver.Build = nil
 	default:
-		log.Print(usage)
-		os.Exit(1)
+		return errUsage
 	}
 
 	fmt.Print(ver.String())
+	return nil
 }
 
-func valid(str string) {
+func valid(str string) error {
 	_, err := semver.Parse(str)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	return err
 }
