@@ -1,0 +1,35 @@
+name: '📊'
+on: [ push ]
+jobs:
+  check:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          check-latest: true
+          cache: true
+      - run: |
+          go test -v ./... -covermode=count -coverprofile=coverage.out
+          go tool cover -func=coverage.out -o=coverage.out
+      - uses: tj-actions/coverage-badge-go@v2
+        with:
+          filename: coverage.out
+      - uses: tj-actions/verify-changed-files@v16
+        id: verify-changed-files
+        with:
+          files: README.md
+      - run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "Coverage Annoyance Robot"
+          git add README.md
+          git commit -m "updated coverage badge"
+        if: steps.verify-changed-files.outputs.files_changed == 'true'
+      - uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ github.token }}
+          branch: ${{ github.head_ref }}
+        if: steps.verify-changed-files.outputs.files_changed == 'true'
