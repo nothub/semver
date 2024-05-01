@@ -53,9 +53,11 @@ func Parse(str string) (Version, error) {
 
 	if len(m[4]) > 0 {
 		ver.PreRelease = strings.Split(m[4], ".")
+		ver.PreRelease = removeEmpty(ver.PreRelease)
 	}
 	if len(m[5]) > 0 {
 		ver.Build = strings.Split(m[5], ".")
+		ver.Build = removeEmpty(ver.Build)
 	}
 
 	return ver, nil
@@ -201,4 +203,14 @@ func isDigits(s string) bool {
 		}
 	}
 	return true
+}
+
+func removeEmpty(arr []string) []string {
+	res := make([]string, 0, len(arr))
+	for _, s := range arr {
+		if strings.TrimSpace(s) != "" {
+			res = append(res, s)
+		}
+	}
+	return res
 }
