@@ -1,9 +1,6 @@
-//go:build exclude
-
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -15,7 +12,7 @@ import (
 const usage string = `semver - utilities for semantic versioning
 
 Options:
-    -h, -help    Show help
+    -h, --help   Show help
 
 Commands:
     next - Bump to the next version
@@ -30,39 +27,44 @@ Commands:
 
 func main() {
 	log.SetFlags(0)
-	flag.Usage = func() {
-		log.Print(usage)
-	}
-	flag.Parse()
 
-	switch strings.ToLower(flag.Arg(0)) {
-	case "next":
-		next()
-	case "strip":
-		strip()
-	case "valid":
-		valid()
-	case "help":
+	checkArgs(1)
+	if os.Args[1] == "-h" || os.Args[1] == "--help" {
 		fmt.Print(usage)
 		os.Exit(0)
+	}
+
+	cmd := strings.ToLower(os.Args[1])
+	switch strings.ToLower(cmd) {
+	case "next":
+		checkArgs(2)
+		next(os.Args[2], os.Args[3])
+	case "strip":
+		checkArgs(2)
+		strip(os.Args[2], os.Args[3])
+	case "valid":
+		checkArgs(1)
+		valid(os.Args[2])
 	default:
 		log.Print(usage)
 		os.Exit(1)
 	}
 }
 
-func next() {
-	if len(flag.Args()) < 3 {
+func checkArgs(min int) {
+	if len(os.Args) < (min + 1) {
 		log.Print(usage)
 		os.Exit(1)
 	}
+}
 
-	ver, err := semver.Parse(flag.Arg(2))
+func next(mode string, str string) {
+	ver, err := semver.Parse(str)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	switch strings.ToLower(flag.Arg(1)) {
+	switch strings.ToLower(mode) {
 	case "major":
 		ver.Major = ver.Major + 1
 	case "minor":
@@ -77,18 +79,13 @@ func next() {
 	fmt.Print(ver.String())
 }
 
-func strip() {
-	if len(flag.Args()) < 3 {
-		log.Print(usage)
-		os.Exit(1)
-	}
-
-	ver, err := semver.Parse(flag.Arg(2))
+func strip(mode string, str string) {
+	ver, err := semver.Parse(str)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	switch strings.ToLower(flag.Arg(1)) {
+	switch strings.ToLower(mode) {
 	case "all":
 		ver.PreRelease = nil
 		ver.Build = nil
@@ -104,13 +101,8 @@ func strip() {
 	fmt.Print(ver.String())
 }
 
-func valid() {
-	if len(flag.Args()) < 2 {
-		log.Print(usage)
-		os.Exit(1)
-	}
-
-	_, err := semver.Parse(flag.Arg(1))
+func valid(str string) {
+	_, err := semver.Parse(str)
 	if err != nil {
 		log.Fatalln(err)
 	}
