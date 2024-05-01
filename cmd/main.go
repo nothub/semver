@@ -121,10 +121,8 @@ func valid() {
 		os.Exit(1)
 	}
 
-	ver, err := semver.Parse(flag.Arg(1))
+	_, err := semver.Parse(flag.Arg(1))
 	if err != nil {
 		log.Fatalln(err)
 	}
-
-	fmt.Print(ver.String())
 }
