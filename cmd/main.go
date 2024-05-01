@@ -42,20 +42,23 @@ func main() {
 	cmd := strings.ToLower(args[0])
 	args = args[1:]
 
+	var out string
 	var err error
+
 	switch cmd {
 	case "next":
 		mustLen(args, 2)
-		err = next(args[0], args[1])
+		out, err = next(args[0], args[1])
 	case "strip":
 		mustLen(args, 2)
-		err = strip(args[0], args[1])
+		out, err = strip(args[0], args[1])
 	case "valid":
 		mustLen(args, 1)
 		err = valid(args[0])
 	default:
 		err = errUsage
 	}
+
 	if err != nil {
 		if errors.Is(err, errUsage) {
 			log.Print(usage)
@@ -64,6 +67,8 @@ func main() {
 			log.Fatalln(err.Error())
 		}
 	}
+
+	fmt.Print(out)
 }
 
 func mustLen(args []string, minLen int) {
@@ -73,10 +78,10 @@ func mustLen(args []string, minLen int) {
 	}
 }
 
-func next(mode string, str string) error {
+func next(mode string, str string) (string, error) {
 	ver, err := semver.Parse(str)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	switch strings.ToLower(mode) {
@@ -87,17 +92,16 @@ func next(mode string, str string) error {
 	case "patch":
 		ver.Patch = ver.Patch + 1
 	default:
-		return errUsage
+		return "", errUsage
 	}
 
-	fmt.Print(ver.String())
-	return nil
+	return ver.String(), nil
 }
 
-func strip(mode string, str string) error {
+func strip(mode string, str string) (string, error) {
 	ver, err := semver.Parse(str)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	switch strings.ToLower(mode) {
@@ -109,11 +113,10 @@ func strip(mode string, str string) error {
 	case "build":
 		ver.Build = nil
 	default:
-		return errUsage
+		return "", errUsage
 	}
 
-	fmt.Print(ver.String())
-	return nil
+	return ver.String(), nil
 }
 
 func valid(str string) error {
