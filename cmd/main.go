@@ -22,6 +22,9 @@ Commands:
 
     strip - Remove pre-release or build metadata
     Usage: semver [opts...] strip (all|pre|build) <version>
+
+    valid - Check input for conformity
+    Usage: semver [opts...] valid <version>
 `
 
 func main() {
@@ -36,6 +39,8 @@ func main() {
 		next()
 	case "strip":
 		strip()
+	case "valid":
+		valid()
 	case "help":
 		fmt.Print(usage)
 		os.Exit(0)
@@ -105,6 +110,20 @@ func strip() {
 	default:
 		log.Print(usage)
 		os.Exit(1)
+	}
+
+	fmt.Print(ver.String())
+}
+
+func valid() {
+	if len(flag.Args()) < 2 {
+		log.Print(usage)
+		os.Exit(1)
+	}
+
+	ver, err := semver.Parse(flag.Arg(1))
+	if err != nil {
+		log.Fatalln(err)
 	}
 
 	fmt.Print(ver.String())
