@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/nothub/semver"
@@ -24,6 +25,9 @@ Commands:
 
     valid - Check input for conformity
     Usage: semver [opts...] valid <version>
+
+    tags - Expand to container tags
+    Usage: semver [opts...] tags <version>
 `
 
 var errUsage = errors.New("invalid usage")
@@ -55,6 +59,9 @@ func main() {
 	case "valid":
 		mustLen(args, 1)
 		err = valid(args[0])
+	case "tags":
+		mustLen(args, 1)
+		out, err = tags(args[0])
 	default:
 		err = errUsage
 	}
@@ -122,4 +129,54 @@ func strip(mode string, str string) (string, error) {
 func valid(str string) error {
 	_, err := semver.Parse(str)
 	return err
+}
+
+func tags(str string) (string, error) {
+	ver, err := semver.Parse(str)
+	if err != nil {
+		return "", err
+	}
+
+	var vers []string
+
+	// major + minor + patch
+	{
+		sb := strings.Builder{}
+		sb.WriteString(strconv.Itoa(ver.Major))
+		sb.WriteString(".")
+		sb.WriteString(strconv.Itoa(ver.Minor))
+		sb.WriteString(".")
+		sb.WriteString(strconv.Itoa(ver.Patch))
+		if len(ver.PreRelease) > 0 {
+			sb.WriteString("-")
+			sb.WriteString(strings.Join(ver.PreRelease, "."))
+		}
+		vers = append(vers, sb.String())
+	}
+
+	// major + minor
+	{
+		sb := strings.Builder{}
+		sb.WriteString(strconv.Itoa(ver.Major))
+		sb.WriteString(".")
+		sb.WriteString(strconv.Itoa(ver.Minor))
+		if len(ver.PreRelease) > 0 {
+			sb.WriteString("-")
+			sb.WriteString(strings.Join(ver.PreRelease, "."))
+		}
+		vers = append(vers, sb.String())
+	}
+
+	// major only
+	{
+		sb := strings.Builder{}
+		sb.WriteString(strconv.Itoa(ver.Major))
+		if len(ver.PreRelease) > 0 {
+			sb.WriteString("-")
+			sb.WriteString(strings.Join(ver.PreRelease, "."))
+		}
+		vers = append(vers, sb.String())
+	}
+
+	return strings.Join(vers, " "), nil
 }
