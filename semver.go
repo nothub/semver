@@ -63,6 +63,34 @@ func Parse(str string) (Version, error) {
 	return ver, nil
 }
 
+func MustParse(str string) Version {
+	vers, err := Parse(str)
+	if err != nil {
+		panic(err)
+	}
+	return vers
+}
+
+func ParseAll(strs []string) ([]Version, error) {
+	var vers []Version
+	for _, str := range strs {
+		ver, err := Parse(str)
+		if err != nil {
+			return nil, err
+		}
+		vers = append(vers, ver)
+	}
+	return vers, nil
+}
+
+func MustParseAll(strs []string) []Version {
+	vers, err := ParseAll(strs)
+	if err != nil {
+		panic(err)
+	}
+	return vers
+}
+
 // IsRelease returns true if Version contains no pre-release metadata.
 func (v *Version) IsRelease() bool {
 	return len(v.PreRelease) == 0
