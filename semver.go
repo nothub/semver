@@ -27,7 +27,7 @@ var ErrInvalid = errors.New("invalid semver string")
 // https://regex101.com/r/vkijKf/1/
 var regex = regexp.MustCompile("^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$")
 
-// Parse will attempts to convert a string to a semver.Version struct.
+// Parse will attempt to convert a string to a semver.Version struct.
 //
 // Parse might return semver.ErrInvalid, strconv.ErrRange or strconv.ErrSyntax.
 func Parse(str string) (Version, error) {
@@ -64,6 +64,7 @@ func Parse(str string) (Version, error) {
 	return ver, nil
 }
 
+// MustParse wraps Parse and panics on error.
 func MustParse(str string) Version {
 	vers, err := Parse(str)
 	if err != nil {
@@ -72,6 +73,9 @@ func MustParse(str string) Version {
 	return vers
 }
 
+// ParseAll will attempt to convert a slice of strings to a slice of semver.Version structs.
+//
+// ParseAll might return semver.ErrInvalid, strconv.ErrRange or strconv.ErrSyntax.
 func ParseAll(strs []string) ([]Version, error) {
 	var vers []Version
 	for _, str := range strs {
@@ -84,6 +88,7 @@ func ParseAll(strs []string) ([]Version, error) {
 	return vers, nil
 }
 
+// MustParseAll wraps ParseAll and panics on error.
 func MustParseAll(strs []string) []Version {
 	vers, err := ParseAll(strs)
 	if err != nil {
@@ -244,6 +249,7 @@ func removeEmpty(arr []string) []string {
 	return res
 }
 
+// SortAsc will sort a slice of Version structs in ascending natural order.
 func SortAsc(vers []Version) []Version {
 	sort.SliceStable(vers, func(i, j int) bool {
 		return vers[i].Older(vers[j])
@@ -251,6 +257,7 @@ func SortAsc(vers []Version) []Version {
 	return vers
 }
 
+// SortDesc will sort a slice of Version structs in descending natural order.
 func SortDesc(vers []Version) []Version {
 	sort.SliceStable(vers, func(i, j int) bool {
 		return vers[i].Newer(vers[j])
