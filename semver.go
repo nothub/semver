@@ -3,6 +3,7 @@ package semver
 import (
 	"errors"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -241,4 +242,18 @@ func removeEmpty(arr []string) []string {
 		}
 	}
 	return res
+}
+
+func SortAsc(vers []Version) []Version {
+	sort.SliceStable(vers, func(i, j int) bool {
+		return vers[i].Older(vers[j])
+	})
+	return vers
+}
+
+func SortDesc(vers []Version) []Version {
+	sort.SliceStable(vers, func(i, j int) bool {
+		return vers[i].Newer(vers[j])
+	})
+	return vers
 }

@@ -527,3 +527,71 @@ func TestVersion_IsRelease(t *testing.T) {
 		})
 	}
 }
+
+func TestSortAsc(t *testing.T) {
+	var input = MustParseAll(
+		[]string{
+			"0.1.0",
+			"1.0.0",
+			"0.0.2-prerelease+meta",
+			"0.0.1",
+			"0.0.2-prerelease",
+			"1.0.0-a.b.c+foo",
+			"0.0.2+meta",
+		})
+
+	var expected = MustParseAll(
+		[]string{
+			"0.0.1",
+			"0.0.2-prerelease+meta",
+			"0.0.2-prerelease",
+			"0.0.2+meta",
+			"0.1.0",
+			"1.0.0-a.b.c+foo",
+			"1.0.0",
+		})
+
+	var sorted = SortAsc(input)
+	if len(sorted) != len(expected) {
+		t.Error("len not equal")
+	}
+	for i := range sorted {
+		if sorted[i].String() != (expected[i]).String() {
+			t.Error("versions not equal")
+		}
+	}
+}
+
+func TestSortDesc(t *testing.T) {
+	var input = MustParseAll(
+		[]string{
+			"0.1.0",
+			"1.0.0",
+			"0.0.2-prerelease+meta",
+			"0.0.1",
+			"0.0.2-prerelease",
+			"1.0.0-a.b.c+foo",
+			"0.0.2+meta",
+		})
+
+	var expected = MustParseAll(
+		[]string{
+			"1.0.0",
+			"1.0.0-a.b.c+foo",
+			"0.1.0",
+			"0.0.2+meta",
+			"0.0.2-prerelease+meta",
+			"0.0.2-prerelease",
+			"0.0.1",
+		})
+
+	var sorted = SortDesc(input)
+	if len(sorted) != len(expected) {
+		t.Error("len not equal")
+	}
+	for i := range sorted {
+		if sorted[i].String() != (expected[i]).String() {
+			t.Error("versions not equal")
+		}
+	}
+}
