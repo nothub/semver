@@ -289,6 +289,40 @@ func TestParseOverflow(t *testing.T) {
 	}
 }
 
+func TestCountPreReleaseData(t *testing.T) {
+	tests := []struct {
+		v Version
+		l int
+	}{
+		{v: MustParse("0.1.0-A"), l: 1},
+		{v: MustParse("0.1.0-A-B-C"), l: 1},
+		{v: MustParse("0.1.0-A.B.C"), l: 3},
+	}
+	for _, tt := range tests {
+		l := len(tt.v.PreRelease)
+		if l != tt.l {
+			t.Errorf("unexpected data count:\nexpected = %v\nactual   = %v", tt.l, l)
+		}
+	}
+}
+
+func TestCountBuildData(t *testing.T) {
+	tests := []struct {
+		v Version
+		l int
+	}{
+		{v: MustParse("0.1.0+A"), l: 1},
+		{v: MustParse("0.1.0+A-B"), l: 1},
+		{v: MustParse("0.1.0+A.B.C"), l: 3},
+	}
+	for _, tt := range tests {
+		l := len(tt.v.Build)
+		if l != tt.l {
+			t.Errorf("unexpected data count:\nexpected = %v\nactual   = %v", tt.l, l)
+		}
+	}
+}
+
 func TestVersion_Equals(t *testing.T) {
 	tests := []struct {
 		a      Version
