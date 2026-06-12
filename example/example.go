@@ -13,10 +13,10 @@ func main() {
 	v1, _ := semver.Parse("1.2.3")
 
 	// or use Version struct directly
-	v2 := semver.Version{Major: "2", Minor: "0", Patch: "0"}
-	v3 := semver.Version{Major: "3", Minor: "0", Patch: "0"}
-	v3pr := semver.Version{Major: "3", Minor: "0", Patch: "0", PreRelease: []string{"alpha"}}
-	v3b := semver.Version{Major: "3", Minor: "0", Patch: "0", Build: []string{"foobar"}}
+	v2 := semver.Version{Major: 2, Minor: 0, Patch: 0}
+	v3 := semver.Version{Major: 3, Minor: 0, Patch: 0}
+	v3pr := semver.Version{Major: 3, Minor: 0, Patch: 0, PreRelease: []string{"alpha"}}
+	v3b := semver.Version{Major: 3, Minor: 0, Patch: 0, Build: []string{"foobar"}}
 
 	fmt.Println("\ncomparing by version core:")
 	fmt.Printf("is %q older then %q? %v\n", v1, v2, v1.Older(v2))
