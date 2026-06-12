@@ -124,9 +124,9 @@ func (a *Version) Same(b Version) bool {
 //
 //	a, _ := Parse("1.2.3")
 //	b, _ := Parse("2.0.0")
-//	Compare(a, a) ->  0 (a older than b)
-//	Compare(a, b) -> -1 (a newer than b)
-//	Compare(b, a) -> +1 (a is same as b)
+//	Compare(a, a) ->  0 (a same as a)
+//	Compare(a, b) -> -1 (a older than b)
+//	Compare(b, a) -> +1 (b newer than a)
 //
 // Build metadata is ignored in this comparison.
 func Compare(a Version, b Version) int {
