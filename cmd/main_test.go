@@ -151,3 +151,50 @@ func Test_valid(t *testing.T) {
 		})
 	}
 }
+
+func Test_tags(t *testing.T) {
+	tests := []struct {
+		name    string
+		str     string
+		want    string
+		wantErr bool
+	}{
+		{
+			name: "release",
+			str:  "1.2.3",
+			want: "1.2.3 1.2 1",
+		},
+		{
+			name: "pre-release appended to all three tags",
+			str:  "1.2.3-alpha.1",
+			want: "1.2.3-alpha.1 1.2-alpha.1 1-alpha.1",
+		},
+		{
+			name: "build metadata stripped",
+			str:  "1.2.3+build.5",
+			want: "1.2.3 1.2 1",
+		},
+		{
+			name: "pre-release kept build stripped",
+			str:  "1.2.3-rc.1+build.5",
+			want: "1.2.3-rc.1 1.2-rc.1 1-rc.1",
+		},
+		{
+			name:    "invalid version",
+			str:     "-0.0.0",
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tags(tt.str)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("tags() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("tags() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
