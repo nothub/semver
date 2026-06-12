@@ -14,38 +14,37 @@ func Test_next(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "next major",
-			args: args{
-				mode: "major",
-				str:  "0.0.0",
-			},
-			want:    "1.0.0",
+			name:    "next major",
+			args:    args{mode: "major", str: "1.2.3"},
+			want:    "2.0.0",
 			wantErr: false,
 		},
 		{
-			name: "next minor",
-			args: args{
-				mode: "minor",
-				str:  "0.0.0",
-			},
-			want:    "0.1.0",
+			name:    "next minor",
+			args:    args{mode: "minor", str: "1.2.3"},
+			want:    "1.3.0",
 			wantErr: false,
 		},
 		{
-			name: "next patch",
-			args: args{
-				mode: "patch",
-				str:  "0.0.0",
-			},
-			want:    "0.0.1",
+			name:    "next patch",
+			args:    args{mode: "patch", str: "1.2.3"},
+			want:    "1.2.4",
 			wantErr: false,
 		},
 		{
-			name: "next invalid",
-			args: args{
-				mode: "major",
-				str:  "-0.0.0",
-			},
+			name:    "next strips pre-release and build",
+			args:    args{mode: "patch", str: "1.2.3-alpha+build"},
+			want:    "1.2.4",
+			wantErr: false,
+		},
+		{
+			name:    "next invalid version",
+			args:    args{mode: "major", str: "-0.0.0"},
+			wantErr: true,
+		},
+		{
+			name:    "next invalid mode",
+			args:    args{mode: "bogus", str: "1.2.3"},
 			wantErr: true,
 		},
 	}

@@ -91,13 +91,19 @@ func next(mode string, str string) (string, error) {
 		return "", err
 	}
 
+	ver.PreRelease = nil
+	ver.Build = nil
+
 	switch strings.ToLower(mode) {
 	case "major":
-		ver.Major = ver.Major + 1
+		ver.Major++
+		ver.Minor = 0
+		ver.Patch = 0
 	case "minor":
-		ver.Minor = ver.Minor + 1
+		ver.Minor++
+		ver.Patch = 0
 	case "patch":
-		ver.Patch = ver.Patch + 1
+		ver.Patch++
 	default:
 		return "", errUsage
 	}
